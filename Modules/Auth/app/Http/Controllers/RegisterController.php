@@ -2,7 +2,6 @@
 
 namespace Modules\Auth\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -10,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
-use Modules\Auth\Models\User;
+use Modules\UserManagement\Models\User;
 
 class RegisterController extends Controller
 {
