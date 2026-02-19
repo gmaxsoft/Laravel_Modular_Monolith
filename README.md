@@ -45,7 +45,7 @@ Architektura została zrealizowana przy użyciu pakietu **nwidart/laravel-module
    - **Views** — `resources/views/`
    - **Providers** — `app/Providers/` (RouteServiceProvider, EventServiceProvider itd.)
 
-5. **Komunikacja między modułami** — moduły mogą korzystać ze wspólnych elementów (np. `App\Http\Controllers\Controller`) oraz referencjonować się nawzajem przez namespace (np. `Modules\Auth\Models\User`).
+5. **Komunikacja między modułami** — moduły mogą korzystać ze wspólnych elementów (np. `App\Http\Controllers\Controller`) oraz referencjonować się nawzajem przez namespace. Moduł Auth korzysta z modelu `Modules\UserManagement\Models\User` — model użytkownika należy do modułu UserManagement, który jest odpowiedzialny za dane użytkownika.
 
 ---
 
@@ -76,22 +76,19 @@ laravel_modular/
 │       └── AppServiceProvider.php
 │
 ├── Modules/                      # Moduły biznesowe
-│   ├── Auth/                    # Moduł autentykacji
+│   ├── Auth/                    # Moduł autentykacji (używa User z UserManagement)
 │   │   ├── app/
 │   │   │   ├── Http/Controllers/
+│   │   │   │   ├── Controller.php           # Bazowy kontroler modułu
 │   │   │   │   ├── LoginController.php
 │   │   │   │   ├── RegisterController.php
 │   │   │   │   ├── PasswordResetLinkController.php
 │   │   │   │   └── NewPasswordController.php
-│   │   │   ├── Models/
-│   │   │   │   └── User.php
 │   │   │   └── Providers/
 │   │   │       ├── AuthServiceProvider.php
 │   │   │       ├── RouteServiceProvider.php
 │   │   │       └── EventServiceProvider.php
 │   │   ├── database/
-│   │   │   ├── factories/
-│   │   │   │   └── UserFactory.php
 │   │   │   └── seeders/
 │   │   ├── resources/
 │   │   │   └── views/
@@ -106,15 +103,20 @@ laravel_modular/
 │   │   ├── module.json
 │   │   └── composer.json
 │   │
-│   └── UserManagement/          # Moduł zarządzania użytkownikami
+│   └── UserManagement/          # Moduł zarządzania użytkownikami (właściciel modelu User)
 │       ├── app/
 │       │   ├── Http/Controllers/
+│       │   │   ├── Controller.php           # Bazowy kontroler modułu
 │       │   │   ├── ProfileController.php
 │       │   │   └── AccountSettingsController.php
 │       │   ├── Models/
+│       │   │   ├── User.php                 # Model użytkownika (używany przez Auth)
 │       │   │   └── Profile.php
 │       │   └── Providers/
 │       ├── database/
+│       │   ├── factories/
+│       │   │   └── UserFactory.php
+│       │   └── seeders/
 │       ├── resources/
 │       │   └── views/
 │       │       ├── profile/
@@ -128,7 +130,7 @@ laravel_modular/
 │   └── providers.php            # Rejestracja providerów modułów
 │
 ├── config/
-│   ├── auth.php                 # Model User → Modules\Auth\Models\User
+│   ├── auth.php                 # Model User → Modules\UserManagement\Models\User
 │   └── modules.php              # Konfiguracja nwidart/laravel-modules
 │
 ├── database/
@@ -232,23 +234,25 @@ composer dump-autoload
 
 ### Auth
 
-Moduł odpowiedzialny za autentykację użytkowników:
+Moduł odpowiedzialny za autentykację użytkowników (logowanie, rejestracja, odzyskiwanie hasła). Wykorzystuje domyślne mechanizmy Laravel 12, ograniczone do tego modułu. **Zależy od modelu User z modułu UserManagement.**
 
-- **Logowanie** — `/login`
-- **Rejestracja** — `/register`
-- **Odzyskiwanie hasła** — `/forgot-password`, `/reset-password/{token}`
+- **Logowanie** — `GET/POST /login`
+- **Rejestracja** — `GET/POST /register`
+- **Odzyskiwanie hasła** — `GET/POST /forgot-password`, `GET/POST /reset-password/{token}`
 - **Wylogowanie** — `POST /logout`
 
-Model użytkownika: `Modules\Auth\Models\User`
+Kontrolery: `LoginController`, `RegisterController`, `PasswordResetLinkController`, `NewPasswordController`
 
 ### UserManagement
 
-Moduł zarządzania kontem i profilem użytkownika (wymaga zalogowania):
+Moduł zarządzania kontem i profilem użytkownika. **Właściciel modelu User** — przechowuje dane użytkownika używane przez moduł Auth. Wymaga zalogowania.
 
-- **Profil** — `/user-management/profile`
-- **Edycja profilu** — `/user-management/profile/edit`
-- **Ustawienia konta** — `/user-management/account-settings`
+- **Profil** — `GET /user-management/profile`
+- **Edycja profilu** — `GET /user-management/profile/edit`, `PUT /user-management/profile`
+- **Ustawienia konta** — `GET /user-management/account-settings`
 - **Zmiana hasła** — `PUT /user-management/account-settings/password`
+
+Model użytkownika: `Modules\UserManagement\Models\User`
 
 ---
 
