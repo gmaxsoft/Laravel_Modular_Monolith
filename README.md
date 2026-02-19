@@ -12,6 +12,7 @@
 - [Struktura projektu](#struktura-projektu)
 - [Instalacja](#instalacja)
 - [Konto demo](#konto-demo)
+- [Testy](#testy)
 - [Użycie](#użycie)
 - [Moduły](#moduły)
 - [Interfejs użytkownika](#interfejs-użytkownika)
@@ -150,6 +151,11 @@ laravel_modular/
 │   ├── web.php                  # / → przekierowanie na login (gość) lub profil (zalogowany)
 │   └── console.php
 │
+├── tests/
+│   ├── Unit/                    # Testy jednostkowe (User, UserFactory, DatabaseSeeder)
+│   ├── Feature/                 # Testy integracyjne (HTTP)
+│   └── TestCase.php
+│
 ├── composer.json                # PSR-4: Modules\ → Modules/
 ├── package.json
 └── README.md
@@ -204,6 +210,46 @@ Po uruchomieniu `php artisan db:seed` dostępne jest konto do testowania:
 |----------|-------------------|
 | **Email** | `demo@example.com` |
 | **Hasło** | `demo123`          |
+
+---
+
+## Testy
+
+Projekt wykorzystuje **PHPUnit 11** do testów. Baza danych w testach używa SQLite w pamięci (konfiguracja w `phpunit.xml`).
+
+### Uruchamianie testów
+
+```bash
+# Wszystkie testy (alternatywnie: composer test)
+php artisan test --compact
+
+# Tylko testy jednostkowe
+php artisan test --compact tests/Unit
+
+# Tylko testy feature
+php artisan test --compact tests/Feature
+
+# Konkretny plik lub metoda
+php artisan test --compact tests/Unit/UserTest.php
+php artisan test --compact --filter=test_seeder_creates_demo_user
+```
+
+### Struktura testów
+
+| Katalog      | Opis                                                                 |
+|--------------|----------------------------------------------------------------------|
+| `tests/Unit` | Testy jednostkowe — model User, UserFactory, DatabaseSeeder         |
+| `tests/Feature` | Testy integracyjne — HTTP, przekierowania, pełne przepływy       |
+
+### Tworzenie nowych testów
+
+```bash
+# Test jednostkowy
+php artisan make:test Unit/NazwaTest --unit --phpunit
+
+# Test feature
+php artisan make:test Feature/NazwaTest --phpunit
+```
 
 ---
 
