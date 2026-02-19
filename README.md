@@ -1,59 +1,257 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Modular Monolith
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Gotowy szablon aplikacji Laravel 12 z architekturą Modular Monolith** — idealny punkt wyjścia do budowy skalowalnych aplikacji webowych z jasno wyodrębnionymi modułami biznesowymi.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Spis treści
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- [O projekcie](#o-projekcie)
+- [Architektura Modular Monolith](#architektura-modular-monolith)
+- [Stack technologiczny](#stack-technologiczny)
+- [Struktura projektu](#struktura-projektu)
+- [Instalacja](#instalacja)
+- [Użycie](#użycie)
+- [Moduły](#moduły)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## O projekcie
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Projekt stanowi **gotowy szablon** do szybkiego rozpoczęcia pracy nad aplikacją opartą na architekturze Modular Monolith. Zawiera wstępnie skonfigurowane moduły **Auth** (logowanie, rejestracja, odzyskiwanie hasła) oraz **UserManagement** (profil użytkownika, ustawienia konta), które można rozbudowywać lub zastępować własną logiką.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Architektura Modular Monolith
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Czym jest Modular Monolith?
 
-### Premium Partners
+Modular Monolith to architektura, w której aplikacja pozostaje pojedynczą monolitową jednostką wdrożeniową, ale wewnętrznie jest podzielona na **niezależne moduły** z własną logiką, trasami, kontrolerami i modelami. Każdy moduł ma jasno określone granice i odpowiedzialność.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Implementacja w tym projekcie
 
-## Contributing
+Architektura została zrealizowana przy użyciu pakietu **nwidart/laravel-modules**:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. **Moduły w katalogu `Modules/`** — każdy moduł ma własną strukturę katalogów (app, routes, views, database itd.) i jest traktowany jak osobna „miniaplikacja”.
 
-## Code of Conduct
+2. **Rejestracja providerów** — moduły rejestrują swoje Service Providery w `bootstrap/providers.php` (struktura Laravel 12), co zapewnia kontrolę nad kolejnością ładowania.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+3. **Autoloading PSR-4** — namespace `Modules\` jest mapowany na katalog `Modules/` w `composer.json`. Dodatkowo **wikimedia/composer-merge-plugin** łączy `composer.json` z każdego modułu, umożliwiając autoload klas z modułów.
 
-## Security Vulnerabilities
+4. **Izolacja modułów** — każdy moduł ma własne:
+   - **Routes** — `routes/web.php`, `routes/api.php`
+   - **Controllers** — `app/Http/Controllers/`
+   - **Models** — `app/Models/`
+   - **Views** — `resources/views/`
+   - **Providers** — `app/Providers/` (RouteServiceProvider, EventServiceProvider itd.)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5. **Komunikacja między modułami** — moduły mogą korzystać ze wspólnych elementów (np. `App\Http\Controllers\Controller`) oraz referencjonować się nawzajem przez namespace (np. `Modules\Auth\Models\User`).
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Stack technologiczny
+
+| Warstwa | Technologia |
+|---------|-------------|
+| **Framework** | Laravel 12 |
+| **PHP** | 8.2+ |
+| **Moduły** | nwidart/laravel-modules ^12.0 |
+| **Frontend** | Vite 7, Tailwind CSS 4, Axios |
+| **Baza danych** | MySQL / PostgreSQL / SQLite (konfigurowalne) |
+| **Testy** | PHPUnit 11 |
+| **Formatowanie kodu** | Laravel Pint |
+| **Środowisko dev** | Laravel Sail, Laravel Herd |
+
+---
+
+## Struktura projektu
+
+```
+laravel_modular/
+├── app/                          # Główna aplikacja Laravel
+│   ├── Http/
+│   │   └── Controllers/
+│   │       └── Controller.php    # Bazowy kontroler
+│   └── Providers/
+│       └── AppServiceProvider.php
+│
+├── Modules/                      # Moduły biznesowe
+│   ├── Auth/                    # Moduł autentykacji
+│   │   ├── app/
+│   │   │   ├── Http/Controllers/
+│   │   │   │   ├── LoginController.php
+│   │   │   │   ├── RegisterController.php
+│   │   │   │   ├── PasswordResetLinkController.php
+│   │   │   │   └── NewPasswordController.php
+│   │   │   ├── Models/
+│   │   │   │   └── User.php
+│   │   │   └── Providers/
+│   │   │       ├── AuthServiceProvider.php
+│   │   │       ├── RouteServiceProvider.php
+│   │   │       └── EventServiceProvider.php
+│   │   ├── database/
+│   │   │   ├── factories/
+│   │   │   │   └── UserFactory.php
+│   │   │   └── seeders/
+│   │   ├── resources/
+│   │   │   └── views/
+│   │   │       ├── login.blade.php
+│   │   │       ├── register.blade.php
+│   │   │       ├── forgot-password.blade.php
+│   │   │       └── reset-password.blade.php
+│   │   ├── routes/
+│   │   │   ├── web.php
+│   │   │   └── api.php
+│   │   ├── config/
+│   │   ├── module.json
+│   │   └── composer.json
+│   │
+│   └── UserManagement/          # Moduł zarządzania użytkownikami
+│       ├── app/
+│       │   ├── Http/Controllers/
+│       │   │   ├── ProfileController.php
+│       │   │   └── AccountSettingsController.php
+│       │   ├── Models/
+│       │   │   └── Profile.php
+│       │   └── Providers/
+│       ├── database/
+│       ├── resources/
+│       │   └── views/
+│       │       ├── profile/
+│       │       └── account-settings/
+│       ├── routes/
+│       ├── module.json
+│       └── composer.json
+│
+├── bootstrap/
+│   ├── app.php
+│   └── providers.php            # Rejestracja providerów modułów
+│
+├── config/
+│   ├── auth.php                 # Model User → Modules\Auth\Models\User
+│   └── modules.php              # Konfiguracja nwidart/laravel-modules
+│
+├── database/
+│   ├── migrations/
+│   ├── factories/
+│   └── seeders/
+│
+├── resources/
+│   └── views/
+│       └── welcome.blade.php
+│
+├── routes/
+│   ├── web.php                  # Główne trasy aplikacji
+│   └── console.php
+│
+├── composer.json                # PSR-4: Modules\ → Modules/
+├── package.json
+└── README.md
+```
+
+---
+
+## Instalacja
+
+```bash
+# Klonowanie repozytorium
+git clone <url-repozytorium> laravel_modular
+cd laravel_modular
+
+# Instalacja zależności PHP
+composer install
+
+# Konfiguracja środowiska
+cp .env.example .env
+php artisan key:generate
+
+# Instalacja zależności Node.js
+npm install
+
+# Migracje bazy danych
+php artisan migrate
+
+# (Opcjonalnie) Seedowanie bazy
+php artisan db:seed
+
+# Budowanie assetów
+npm run build
+```
+
+### Uruchomienie w trybie deweloperskim
+
+```bash
+composer run dev
+```
+
+Uruchomi jednocześnie serwer PHP, kolejkę i Vite.
+
+---
+
+## Użycie
+
+### Tworzenie nowego modułu
+
+```bash
+php artisan module:make NazwaModulu
+```
+
+### Generowanie elementów w module
+
+```bash
+# Kontroler
+php artisan module:make-controller NazwaKontrolera NazwaModulu
+
+# Model
+php artisan module:make-model NazwaModelu NazwaModulu
+
+# Migracja
+php artisan module:make-migration create_tabela NazwaModulu
+
+# Widok
+php artisan module:make-view nazwa-widoku NazwaModulu
+```
+
+### Rejestracja nowego modułu
+
+Po utworzeniu modułu dodaj jego Service Provider do `bootstrap/providers.php`:
+
+```php
+\Modules\NazwaModulu\Providers\NazwaModuluServiceProvider::class,
+```
+
+Następnie uruchom:
+
+```bash
+composer dump-autoload
+```
+
+---
+
+## Moduły
+
+### Auth
+
+Moduł odpowiedzialny za autentykację użytkowników:
+
+- **Logowanie** — `/login`
+- **Rejestracja** — `/register`
+- **Odzyskiwanie hasła** — `/forgot-password`, `/reset-password/{token}`
+- **Wylogowanie** — `POST /logout`
+
+Model użytkownika: `Modules\Auth\Models\User`
+
+### UserManagement
+
+Moduł zarządzania kontem i profilem użytkownika (wymaga zalogowania):
+
+- **Profil** — `/user-management/profile`
+- **Edycja profilu** — `/user-management/profile/edit`
+- **Ustawienia konta** — `/user-management/account-settings`
+- **Zmiana hasła** — `PUT /user-management/account-settings/password`
+
+---
+
+## Licencja
+
+MIT License
