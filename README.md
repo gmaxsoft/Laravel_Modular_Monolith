@@ -13,6 +13,7 @@
 - [Instalacja](#instalacja)
 - [Konto demo](#konto-demo)
 - [Testy](#testy)
+- [GitHub Actions](#github-actions)
 - [Użycie](#użycie)
 - [Moduły](#moduły)
 - [Interfejs użytkownika](#interfejs-użytkownika)
@@ -151,6 +152,9 @@ laravel_modular/
 │   ├── web.php                  # / → przekierowanie na login (gość) lub profil (zalogowany)
 │   └── console.php
 │
+├── .github/
+│   └── workflows/               # GitHub Actions (Tests, Laravel Pint)
+│
 ├── tests/
 │   ├── Unit/                    # Testy jednostkowe (User, UserFactory, DatabaseSeeder)
 │   ├── Feature/                 # Testy integracyjne (HTTP)
@@ -250,6 +254,19 @@ php artisan make:test Unit/NazwaTest --unit --phpunit
 # Test feature
 php artisan make:test Feature/NazwaTest --phpunit
 ```
+
+---
+
+## GitHub Actions
+
+Projekt zawiera workflowy CI uruchamiane przy push i pull request na gałęzie `main` oraz `develop`:
+
+| Workflow | Opis |
+|----------|------|
+| **Tests** | Uruchamia testy PHPUnit na PHP 8.2 i 8.3 (composer, npm, build, test) |
+| **Laravel Pint** | Sprawdza formatowanie kodu (`vendor/bin/pint --test`) |
+
+Workflowy znajdują się w `.github/workflows/`.
 
 ---
 
