@@ -11,14 +11,18 @@
 - [Stack technologiczny](#stack-technologiczny)
 - [Struktura projektu](#struktura-projektu)
 - [Instalacja](#instalacja)
+- [Konto demo](#konto-demo)
 - [Użycie](#użycie)
 - [Moduły](#moduły)
+- [Interfejs użytkownika](#interfejs-użytkownika)
 
 ---
 
 ## O projekcie
 
 Projekt stanowi **gotowy szablon** do szybkiego rozpoczęcia pracy nad aplikacją opartą na architekturze Modular Monolith. Zawiera wstępnie skonfigurowane moduły **Auth** (logowanie, rejestracja, odzyskiwanie hasła) oraz **UserManagement** (profil użytkownika, ustawienia konta), które można rozbudowywać lub zastępować własną logiką.
+
+Interfejs użytkownika opiera się na **Tailwind CSS 4** z nowoczesnym designem — ciemne tło z gradientem na ekranach auth, białe karty z zaokrąglonymi rogami, spójna paleta kolorów (indigo, slate). Przy wejściu na stronę główną (`/`) użytkownik niezalogowany jest przekierowywany od razu na formularz logowania.
 
 ---
 
@@ -57,7 +61,7 @@ Architektura została zrealizowana przy użyciu pakietu **nwidart/laravel-module
 | **PHP** | 8.2+ |
 | **Moduły** | nwidart/laravel-modules ^12.0 |
 | **Frontend** | Vite 7, Tailwind CSS 4, Axios |
-| **Baza danych** | MySQL / PostgreSQL / SQLite (konfigurowalne) |
+| **Baza danych** | MySQL (domyślnie) / PostgreSQL / SQLite |
 | **Testy** | PHPUnit 11 |
 | **Formatowanie kodu** | Laravel Pint |
 | **Środowisko dev** | Laravel Sail, Laravel Herd |
@@ -143,7 +147,7 @@ laravel_modular/
 │       └── welcome.blade.php
 │
 ├── routes/
-│   ├── web.php                  # Główne trasy aplikacji
+│   ├── web.php                  # / → przekierowanie na login (gość) lub profil (zalogowany)
 │   └── console.php
 │
 ├── composer.json                # PSR-4: Modules\ → Modules/
@@ -167,13 +171,17 @@ composer install
 cp .env.example .env
 php artisan key:generate
 
+# Konfiguracja MySQL (domyślnie)
+# W .env ustaw: DB_CONNECTION=mysql, DB_DATABASE=laravel_modular, DB_USERNAME, DB_PASSWORD
+# Utwórz bazę: CREATE DATABASE laravel_modular CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 # Instalacja zależności Node.js
 npm install
 
 # Migracje bazy danych
 php artisan migrate
 
-# (Opcjonalnie) Seedowanie bazy
+# Seedowanie bazy (tworzy konto demo)
 php artisan db:seed
 
 # Budowanie assetów
@@ -187,6 +195,15 @@ composer run dev
 ```
 
 Uruchomi jednocześnie serwer PHP, kolejkę i Vite.
+
+### Konto demo
+
+Po uruchomieniu `php artisan db:seed` dostępne jest konto do testowania:
+
+| Pole     | Wartość           |
+|----------|-------------------|
+| **Email** | `demo@example.com` |
+| **Hasło** | `demo123`          |
 
 ---
 
@@ -253,6 +270,28 @@ Moduł zarządzania kontem i profilem użytkownika. **Właściciel modelu User**
 - **Zmiana hasła** — `PUT /user-management/account-settings/password`
 
 Model użytkownika: `Modules\UserManagement\Models\User`
+
+---
+
+## Interfejs użytkownika
+
+Aplikacja wykorzystuje **Tailwind CSS 4** z Vite do budowy interfejsu:
+
+- **Strona główna** — adres `/` przekierowuje gości na `/login`, zalogowanych na `/user-management/profile`
+- **Ekrany auth** — ciemne tło z gradientem (slate-900), białe karty z cieniem i zaokrąglonymi rogami
+- **Profil i ustawienia** — jasne tło (slate-50), nagłówek z nawigacją, karty z gradientem w nagłówku
+- **Czcionka** — Figtree (Google Fonts)
+- **Kolory** — indigo (akcenty, przyciski), slate (tła, tekst)
+
+### Uruchomienie assetów
+
+```bash
+# Tryb deweloperski (hot reload)
+npm run dev
+
+# Produkcja
+npm run build
+```
 
 ---
 
